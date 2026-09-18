@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://familab.com.py/sitemap.xml
