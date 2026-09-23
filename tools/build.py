@@ -397,7 +397,7 @@ NAV = [('Inicio', '#inicio'), ('Atención médica', '#san-blas'), ('Laboratorio'
 def marca_dual(base, clase='marca-dual'):
     """El header lleva las dos marcas: ninguna absorbe a la otra."""
     return f'''<span class="{clase}">
-        <img class="m-sb" src="{base}fotos/san-blas.png" alt="Centro Médico San Blas" width="560" height="466" decoding="async">
+        <img class="m-sb" src="{base}fotos/san-blas.png" alt="Centro Médico San Blas" width="560" height="464" decoding="async">
         <span class="m-mas" aria-hidden="true">+</span>
         <img class="m-fl" src="{base}fotos/logo-marca.png" alt="Laboratorio FamiLab" width="400" height="400" decoding="async">
       </span>'''
@@ -588,7 +588,7 @@ def tarjeta_sede(s, delay=0):
       </article>'''
 
 
-def seccion_ubicacion():
+def seccion_ubicacion(base=''):
     """Ubicación de los dos: el documento pide destacar que están a una cuadra."""
     tarjetas = '\n'.join(tarjeta_sede(s, i * 110) for i, s in enumerate(SEDES))
     dir_sb = ('%s, %s' % (SAN_BLAS['dir'], SAN_BLAS['ciudad'])) if SAN_BLAS['dir'] else SAN_BLAS['ciudad']
@@ -604,7 +604,7 @@ def seccion_ubicacion():
 
     <div class="cuadra" data-reveal>
       <div class="cuadra-punto cuadra-punto--sb">
-        <img src="fotos/san-blas-marca.png" alt="" width="400" height="400" decoding="async">
+        <img src="{base}fotos/san-blas-marca.png" alt="" width="400" height="400" decoding="async">
         <div>
           <b>{e(SAN_BLAS['nombre'])}</b>
           <span>Consultas médicas · {e(dir_sb)}</span>
@@ -614,7 +614,7 @@ def seccion_ubicacion():
         <span class="cuadra-dist">{e(SAN_BLAS['distancia'])}</span>
       </div>
       <div class="cuadra-punto cuadra-punto--fl">
-        <img src="fotos/logo-marca.png" alt="" width="400" height="400" decoding="async">
+        <img src="{base}fotos/logo-marca.png" alt="" width="400" height="400" decoding="async">
         <div>
           <b>Laboratorio FamiLab</b>
           <span>Análisis clínicos · {e(SEDES[0]['dir'])}, {e(SEDES[0]['ciudad'])}</span>
@@ -1424,7 +1424,7 @@ def pagina_servicio(s):
     </div>
   </div>
 </section>
-''' + presupuesto(base) + seccion_ubicacion() + f'''
+''' + presupuesto(base) + seccion_ubicacion(base) + f'''
 <section class="sec sec--sky">
   <div class="wrap">
     <div class="sec-head center" data-reveal>

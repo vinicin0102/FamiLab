@@ -113,10 +113,23 @@ La diferencia entre marcas no la hace el tono sino el tratamiento:
 Los dos logos van juntos en el header y en el footer (`.marca-dual`), separados
 por un `+`: ninguna marca absorbe a la otra.
 
-Los logos salieron de capturas dentro de los PDF de onboarding:
-`fotos/san-blas.png`, `fotos/san-blas-marca.png`, `fotos/logo.png` y
-`fotos/logo-marca.png`. **Conviene pedir los archivos originales** (vectoriales
-o PNG con transparencia) para reemplazarlos.
+Los cuatro archivos de marca son PNG con fondo transparente, recortados del
+material que envió el cliente:
+
+| Archivo | Qué es | Dónde se usa |
+|---|---|---|
+| `fotos/logo.png` | FamiLab completo, con bajada | footer |
+| `fotos/logo-marca.png` | sólo el matraz | header, chips, bloque de la cuadra |
+| `fotos/san-blas.png` | San Blas completo | header y footer |
+| `fotos/san-blas-marca.png` | sólo el corazón con la mano | chips, bloque de la cuadra |
+
+Al ser transparentes funcionan igual sobre fondo claro y sobre la franja oscura:
+el trazo blanco de cada logo los separa del fondo. Por eso ningún contenedor les
+pone color de fondo — si se reemplazan por versiones opacas, hay que revisar
+`.marca-dual`, `.marca-chip` y `.cuadra-punto` en `assets/estilos.css`.
+
+El de San Blas todavía sale de una captura del PDF de onboarding: **conviene
+pedir el original** (vectorial o PNG de más resolución).
 
 ## Datos que usa el sitio
 
