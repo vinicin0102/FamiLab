@@ -632,3 +632,183 @@ svg{fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stro
   [data-reveal]{opacity:1; transform:none}
 }
 @media print{.hdr,.wa-float,.wa-bar,.mnav{display:none!important}}
+
+/* ============================================================
+   ECOSISTEMA SAN BLAS + FAMILAB
+   Dos marcas conectadas. Ninguna absorbe a la otra: San Blas
+   lidera en cian sólido, FamiLab en franjas oscuras y verde.
+   ============================================================ */
+
+/* --- marca dual del header y del footer --- */
+.marca-dual{display:flex; align-items:center; gap:11px}
+.marca-dual .m-sb{height:44px; width:auto; transition:height .35s var(--ease)}
+.marca-dual .m-fl{height:40px; width:40px; border-radius:11px; background:#000; object-fit:cover;
+  box-shadow:0 8px 18px -10px rgba(4,34,46,.9); transition:height .35s var(--ease), width .35s var(--ease)}
+.marca-dual .m-mas{font-family:Manrope,sans-serif; font-weight:800; font-size:1.05rem; color:var(--muted); line-height:1}
+.hdr.stuck .marca-dual .m-sb{height:36px}
+.hdr.stuck .marca-dual .m-fl{height:33px; width:33px}
+.logo:hover .marca-dual .m-fl{transform:rotate(-6deg) scale(1.05)}
+.marca-dual--ftr{background:#fff; padding:12px 16px; border-radius:16px}
+.marca-dual--ftr .m-sb{height:50px}
+.marca-dual--ftr .m-fl{height:46px; width:46px}
+.ftr .logo-plate{background:none; padding:0; box-shadow:none}
+
+/* --- chip de marca dentro de una sección --- */
+.marca-chip{
+  display:inline-flex; align-items:center; gap:10px; padding:8px 18px 8px 8px; border-radius:999px;
+  font-family:Manrope,sans-serif; font-weight:800; font-size:.8rem; letter-spacing:.04em;
+  margin-bottom:18px; border:1px solid var(--line); background:#fff; box-shadow:var(--sh-1);
+}
+.marca-chip img{width:30px; height:30px; border-radius:9px; object-fit:cover; flex:none}
+.marca-chip--sb{color:var(--cy-800)}
+.marca-chip--sb img{background:#fff}
+.marca-chip--fl{color:var(--gr-800)}
+.marca-chip--fl img{background:#000}
+.dark .marca-chip{background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.2); color:#fff}
+
+/* --- sección con identidad San Blas --- */
+.sec--sb{background:linear-gradient(180deg,#fff 0%,var(--cy-50) 45%,#fff 100%); position:relative}
+.sec--sb::before{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.4;
+  background-image:radial-gradient(rgba(0,147,198,.15) 1px, transparent 1px); background-size:28px 28px;
+  -webkit-mask-image:radial-gradient(70% 60% at 50% 0%, #000, transparent 75%);
+  mask-image:radial-gradient(70% 60% at 50% 0%, #000, transparent 75%);
+}
+.sec--sb .wrap{position:relative; z-index:1}
+
+/* --- los dos recorridos --- */
+.rutas{display:grid; grid-template-columns:1fr 1fr; gap:clamp(18px,2.6vw,30px)}
+.ruta{
+  position:relative; background:#fff; border:1px solid var(--line); border-radius:var(--r-xl);
+  padding:clamp(26px,3vw,38px); box-shadow:var(--sh-1); display:flex; flex-direction:column;
+  overflow:hidden; transition:transform .4s var(--ease), box-shadow .4s, border-color .3s;
+}
+.ruta::before{content:""; position:absolute; inset:0 0 auto 0; height:5px}
+.ruta--consulta::before{background:linear-gradient(90deg,var(--cy-500),var(--cy-800))}
+.ruta--analisis::before{background:linear-gradient(90deg,var(--gr-500),var(--gr-800))}
+.ruta:hover{transform:translateY(-6px); box-shadow:var(--sh-2)}
+.ruta--consulta:hover{border-color:var(--cy-200)}
+.ruta--analisis:hover{border-color:var(--gr-300)}
+.ruta-marca{
+  display:inline-flex; align-items:center; gap:8px; font-family:Manrope,sans-serif; font-weight:800;
+  font-size:11.5px; letter-spacing:.13em; text-transform:uppercase; margin-bottom:16px;
+}
+.ruta-marca svg{width:17px; height:17px}
+.ruta--consulta .ruta-marca{color:var(--cy-700)}
+.ruta--analisis .ruta-marca{color:var(--gr-700)}
+.ruta h3{font-size:clamp(1.3rem,2.2vw,1.65rem); letter-spacing:-.03em}
+.ruta>p{margin-top:12px; color:var(--ink-soft); font-size:.97rem; line-height:1.68}
+.ruta-pasos{list-style:none; padding:0; margin:24px 0 28px; display:grid; gap:12px; flex:1}
+.ruta-pasos li{display:flex; align-items:flex-start; gap:12px; font-size:.93rem; color:var(--ink); line-height:1.5}
+.ruta-pasos li span{
+  width:25px; height:25px; border-radius:8px; flex:none; display:grid; place-items:center;
+  font-family:Manrope,sans-serif; font-weight:800; font-size:.76rem; color:#fff; margin-top:1px;
+}
+.ruta--consulta .ruta-pasos li span{background:linear-gradient(150deg,var(--cy-500),var(--cy-800))}
+.ruta--analisis .ruta-pasos li span{background:linear-gradient(150deg,var(--gr-500),var(--gr-800))}
+.ruta-alt{
+  display:inline-flex; align-items:center; gap:7px; margin-top:16px; justify-content:center;
+  font-family:Manrope,sans-serif; font-weight:700; font-size:.85rem; color:var(--ink-soft);
+}
+.ruta-alt svg{width:15px; height:15px; transition:transform .3s var(--ease)}
+.ruta:hover .ruta-alt svg{transform:translateX(4px)}
+.ruta-alt:hover{color:var(--cy-800)}
+
+/* --- estado vacío: San Blas sin datos cargados todavía --- */
+.vacio{
+  max-width:720px; margin-inline:auto; text-align:center; padding:clamp(32px,4vw,52px);
+  border-radius:var(--r-xl); background:#fff; border:1px solid var(--line); box-shadow:var(--sh-1);
+}
+.vacio .itile{margin:0 auto 20px}
+.vacio h3{font-size:clamp(1.2rem,2vw,1.5rem)}
+.vacio p{margin-top:12px; color:var(--ink-soft); font-size:.97rem; line-height:1.68}
+
+/* --- el circuito de atención --- */
+.circuito{
+  list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(5,1fr);
+  gap:clamp(10px,1.4vw,18px); position:relative;
+}
+.circ-paso{
+  position:relative; text-align:center; padding:26px 16px 24px; border-radius:var(--r-lg);
+  background:#fff; border:1px solid var(--line); box-shadow:var(--sh-1);
+  transition:transform .4s var(--ease), box-shadow .4s, border-color .3s;
+}
+.circ-paso:hover{transform:translateY(-5px); box-shadow:var(--sh-2)}
+.circ-paso::after{
+  content:""; position:absolute; top:50%; right:calc(-1 * clamp(10px,1.4vw,18px) / 2 - 5px);
+  width:10px; height:10px; border-top:2px solid var(--cy-300); border-right:2px solid var(--cy-300);
+  transform:translateY(-50%) rotate(45deg); z-index:2;
+}
+.circ-paso:last-child::after{display:none}
+.circ-ico{
+  width:52px; height:52px; margin:0 auto 14px; border-radius:16px; display:grid; place-items:center;
+  border:1px solid var(--line); box-shadow:inset 0 1px 0 #fff;
+}
+.circ-paso--sb .circ-ico{background:linear-gradient(150deg,var(--cy-100),#fff); color:var(--cy-700)}
+.circ-paso--fl .circ-ico{background:linear-gradient(150deg,var(--gr-100),#fff); color:var(--gr-700)}
+.circ-paso b{display:block; font-family:Manrope,sans-serif; font-size:1rem; letter-spacing:-.02em}
+.circ-d{display:block; margin-top:7px; font-size:.83rem; color:var(--ink-soft); line-height:1.5}
+.circ-leyenda{display:flex; justify-content:center; flex-wrap:wrap; gap:12px 28px; margin-top:30px;
+  font-size:.86rem; color:var(--ink-soft); font-weight:500}
+.circ-leyenda span{display:inline-flex; align-items:center; gap:9px}
+.circ-leyenda .pt{width:11px; height:11px; border-radius:50%; flex:none}
+.circ-leyenda .pt--sb{background:linear-gradient(150deg,var(--cy-500),var(--cy-800))}
+.circ-leyenda .pt--fl{background:linear-gradient(150deg,var(--gr-500),var(--gr-800))}
+
+/* --- la cuadra que separa a las dos empresas --- */
+.cuadra{
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:clamp(12px,2vw,26px);
+  padding:clamp(24px,3vw,36px); border-radius:var(--r-xl); background:#fff;
+  border:1px solid var(--line); box-shadow:var(--sh-2);
+}
+.cuadra-punto{display:flex; align-items:center; gap:16px}
+.cuadra-punto img{width:58px; height:58px; border-radius:16px; flex:none; object-fit:cover; border:1px solid var(--line)}
+.cuadra-punto--fl img{background:#000}
+.cuadra-punto--sb img{background:#fff}
+.cuadra-punto b{display:block; font-family:Manrope,sans-serif; font-size:1.05rem; letter-spacing:-.025em}
+.cuadra-punto span{display:block; margin-top:4px; font-size:.86rem; color:var(--ink-soft); line-height:1.5}
+.cuadra-linea{position:relative; min-width:clamp(150px,20vw,290px); height:2px; border-radius:2px;
+  background:repeating-linear-gradient(90deg,var(--cy-300) 0 8px,transparent 8px 16px)}
+.cuadra-dist{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); white-space:nowrap;
+  padding:7px 15px; border-radius:999px; background:var(--cy-50); border:1px solid var(--cy-200);
+  font-family:Manrope,sans-serif; font-weight:700; font-size:.78rem; color:var(--cy-800);
+}
+
+/* --- accesos por intención: los de San Blas se distinguen --- */
+.motivo--sb .b{background:var(--cy-100); color:var(--cy-800)}
+.motivo--sb:hover{border-color:var(--cy-300)}
+.motivo--sb:hover .b{background:linear-gradient(150deg,var(--cy-500),var(--cy-800))}
+
+/* --- números sobre franja oscura --- */
+.nums--dark .num-card{background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.16); box-shadow:none}
+.nums--dark .num-card b{background:linear-gradient(120deg,var(--cy-300),var(--gr-300));
+  -webkit-background-clip:text; background-clip:text; color:transparent}
+.nums--dark .num-card span{color:rgba(232,247,253,.78)}
+
+/* --- barra mobile con las dos acciones --- */
+.wa-bar{display:none; gap:10px}
+@media (max-width:760px){
+  .wa-bar{display:flex}
+  .wa-bar .btn{flex:1; min-width:0; padding-inline:14px; font-size:.86rem}
+}
+
+@media (max-width:1080px){
+  .circuito{grid-template-columns:repeat(3,1fr)}
+  .circ-paso:nth-child(3)::after{display:none}
+}
+@media (max-width:900px){
+  .rutas{grid-template-columns:1fr}
+  .cuadra{grid-template-columns:1fr; gap:18px; text-align:left}
+  .cuadra-linea{width:2px; height:56px; min-width:0; justify-self:center;
+    background:repeating-linear-gradient(180deg,var(--cy-300) 0 8px,transparent 8px 16px)}
+}
+@media (max-width:760px){
+  .circuito{grid-template-columns:1fr}
+  .circ-paso{display:flex; align-items:center; gap:16px; text-align:left; padding:18px 20px}
+  .circ-ico{margin:0; width:46px; height:46px}
+  .circ-paso::after{top:auto; bottom:-14px; right:50%; transform:translateX(50%) rotate(135deg)}
+  .marca-dual .m-sb{height:34px}
+  .marca-dual .m-fl{height:32px; width:32px}
+  .marca-dual--ftr{padding:10px 13px}
+}

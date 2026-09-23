@@ -253,6 +253,110 @@ FAQ = [
       'rutina más habituales antes de venir.']),
 ]
 
+
+# ============================================================================
+#  CENTRO MÉDICO SAN BLAS
+#  San Blas es la puerta de entrada del ecosistema; FamiLab, el brazo
+#  diagnóstico. Son dos empresas distintas del mismo propietario, a una cuadra
+#  una de la otra, que se derivan pacientes.
+# ============================================================================
+
+# PENDIENTE: WhatsApp propio del Centro Médico San Blas.
+# Mientras no esté cargado, las consultas médicas entran por el WhatsApp de
+# FamiLab Coronel Bogado, que hoy ya coordina las derivaciones entre ambos.
+# Al cargarlo acá, todos los CTA de consulta pasan a ese número solos.
+TEL_SB, TEL_SB_VIS = None, None
+
+SAN_BLAS = dict(
+    nombre='Centro Médico San Blas',
+    corto='San Blas',
+    ciudad='Coronel Bogado, Itapúa',
+    # PENDIENTE: dirección exacta y coordenadas propias de San Blas.
+    # Mientras tanto el mapa del ecosistema centra en FamiLab y el texto dice
+    # la relación real entre ambos: están a una cuadra.
+    dir=None,
+    distancia='a una cuadra del laboratorio',
+    horarios=None,   # PENDIENTE
+)
+
+
+def wa_sb(msg):
+    """CTA de consulta médica. Usa el número de San Blas cuando esté cargado."""
+    return wa(msg, TEL_SB or TEL1)
+
+
+# Especialidades del Centro Médico San Blas.
+# PENDIENTE: el documento de orientación lo dice expresamente — «necesitamos
+# todavía la información completa de médicos y especialidades de San Blas».
+# Formato de cada una, para cuando llegue la lista:
+#     ('i-icono', 'Especialidad', 'Qué problema atiende, en palabras del paciente')
+ESPECIALIDADES_SB = []
+
+# Profesionales del Centro Médico San Blas.
+#     dict(nombre='Dr. [Nombre]', esp='Especialidad', reg='Reg. Prof. [número]',
+#          foto='fotos/san-blas/[slug].jpg')
+PROFESIONALES_SB = []
+
+# Servicios y procedimientos que se resuelven en el consultorio de San Blas.
+#     ('i-icono', 'Servicio', 'Qué resuelve')
+SERVICIOS_SB = []
+
+# --------------------------------------------------------- los dos recorridos ----
+RUTAS = [
+    dict(clave='consulta', marca='Centro Médico San Blas', icono='i-stetho',
+         titulo='Necesito atención médica',
+         desc='Todavía no sabés qué tenés o querés que un médico te evalúe. '
+              'Empezás por la consulta en San Blas y, si hacen falta análisis, '
+              'los hacés a una cuadra.',
+         pasos=['Consulta con el especialista', 'Diagnóstico y tratamiento',
+                'Análisis en FamiLab si corresponde', 'Seguimiento con tu médico'],
+         cta='Agendar una consulta', icono_cta='i-calendar',
+         msg='quiero agendar una consulta en el Centro Médico San Blas.', sb=True),
+    dict(clave='analisis', marca='Laboratorio FamiLab', icono='i-tube',
+         titulo='Ya tengo un pedido médico',
+         desc='Tu médico ya te indicó los estudios. Mandás la foto del pedido, '
+              'recibís el presupuesto y te decimos cómo tenés que venir.',
+         pasos=['Mandás la foto del pedido médico', 'Recibís el presupuesto y la preparación',
+                'Venís al laboratorio o vamos a tu casa', 'Retirás o recibís los resultados'],
+         cta='Enviar pedido médico', icono_cta='i-camera',
+         msg=PRESUPUESTO, sb=False),
+]
+
+# ------------------------------------------------------------------ circuito ----
+CIRCUITO = [
+    ('i-calendar', 'Consulta', 'Te atiende un médico en San Blas', True),
+    ('i-stetho', 'Diagnóstico', 'Evaluación y, si hace falta, pedido de estudios', True),
+    ('i-tube', 'Análisis', 'Los hacés en FamiLab, a una cuadra', False),
+    ('i-doc-check', 'Resultados', 'La mayoría, el mismo día', False),
+    ('i-heart', 'Seguimiento', 'Volvés a tu médico con los resultados', True),
+]
+
+# ------------------------------------------- accesos de WhatsApp por intención ----
+# El documento pide accesos que identifiquen la intención, no un «contactar»
+# genérico: eso ordena después los leads en el CRM.
+INTENCIONES = [
+    ('i-calendar',  'Agendar una consulta',   'quiero agendar una consulta médica en el Centro Médico San Blas.', True),
+    ('i-stetho',    'Consultar una especialidad', 'quiero consultar por una especialidad del Centro Médico San Blas.', True),
+    ('i-camera',    'Enviar pedido médico',   PRESUPUESTO, False),
+    ('i-money',     'Solicitar presupuesto',  'quiero un presupuesto de análisis de laboratorio.', False),
+    ('i-doc-check', 'Consultar resultados',   'quiero consultar por mis resultados de laboratorio.', False),
+    ('i-home',      'Atención a domicilio',   'quiero una extracción a domicilio. Mi ubicación es:', False),
+]
+
+# Preguntas propias del ecosistema, que se suman a las del laboratorio.
+FAQ_ECO = [
+    ('¿San Blas y FamiLab son lo mismo?',
+     ['No. Son dos empresas distintas del mismo propietario, ubicadas a una cuadra una de la otra.',
+      'El Centro Médico San Blas atiende consultas médicas. FamiLab es el laboratorio de análisis '
+      'clínicos. Trabajan juntos: si en la consulta te piden estudios, los hacés al lado.']),
+    ('Me atendí en San Blas, ¿tengo algún beneficio en el laboratorio?',
+     ['Sí. Los pacientes derivados del Centro Médico San Blas tienen descuentos especiales en FamiLab. '
+      'Avisanos al pedir el presupuesto que venís de San Blas.']),
+    ('¿Tengo que ir a San Blas para hacerme análisis?',
+     ['No. Si ya tenés el pedido médico de cualquier profesional, venís directo a FamiLab. '
+      'Tampoco hace falta pedido médico para los estudios de control: escribinos y te orientamos.']),
+]
+
 # ============================================================ fragmentos ====
 def head(titulo, descripcion, base, canonical):
     return f'''<!DOCTYPE html>
@@ -267,13 +371,13 @@ def head(titulo, descripcion, base, canonical):
 <link rel="canonical" href="{DOMINIO}/{canonical}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_PY">
-<meta property="og:site_name" content="Laboratorio FamiLab">
+<meta property="og:site_name" content="Centro Médico San Blas + FamiLab">
 <meta property="og:title" content="{e(titulo)}">
 <meta property="og:description" content="{e(descripcion)}">
-<meta property="og:image" content="{DOMINIO}/fotos/logo.png">
+<meta property="og:image" content="{DOMINIO}/fotos/san-blas.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Cpath d='M13 6v6.5a5.5 5.5 0 1 0 6 0V6' fill='none' stroke='%2300AFF0' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M11.5 6h9' stroke='%2300AFF0' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='19' r='4.2' fill='%2376C04D'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="{base}fotos/logo-marca.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300AFF0'/%3E%3Cpath d='M16 25.5C9.5 20.8 5 17.6 5 13.4 5 10 7.6 7.5 10.8 7.5c1.9 0 3.6.9 4.7 2.3l.5.7.5-.7a5.9 5.9 0 0 1 4.7-2.3C24.4 7.5 27 10 27 13.4c0 4.2-4.5 7.4-11 12.1Z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="{base}fotos/san-blas-marca.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap">
@@ -286,29 +390,34 @@ def head(titulo, descripcion, base, canonical):
 {SPRITE}
 '''
 
-NAV = [('Inicio', '#inicio'), ('Servicios', '#servicios'), ('Preparación', '#preparacion'),
-       ('A domicilio', '#domicilio'), ('Sedes', '#sedes'), ('Preguntas', '#preguntas')]
+NAV = [('Inicio', '#inicio'), ('Atención médica', '#san-blas'), ('Laboratorio', '#familab'),
+       ('Preparación', '#preparacion'), ('Dónde estamos', '#ubicacion'), ('Preguntas', '#preguntas')]
+
+
+def marca_dual(base, clase='marca-dual'):
+    """El header lleva las dos marcas: ninguna absorbe a la otra."""
+    return f'''<span class="{clase}">
+        <img class="m-sb" src="{base}fotos/san-blas.png" alt="Centro Médico San Blas" width="560" height="466" decoding="async">
+        <span class="m-mas" aria-hidden="true">+</span>
+        <img class="m-fl" src="{base}fotos/logo-marca.png" alt="Laboratorio FamiLab" width="400" height="400" decoding="async">
+      </span>'''
+
 
 def header(base):
     ini = base + 'index.html' if base else ''
     links = '\n'.join(f'      <a href="{ini}{h}">{e(t)}</a>' for t, h in NAV)
     mlinks = '\n'.join(f'  <a href="{ini}{h}">{e(t)}</a>' for t, h in NAV)
-    cta = wa(PRESUPUESTO)
     return f'''<header class="hdr" id="hdr">
   <div class="wrap">
-    <a href="{ini or '#inicio'}" class="logo" aria-label="Laboratorio FamiLab — inicio">
-      <img class="logo-mark" src="{base}fotos/logo-marca.png" alt="" width="400" height="400" decoding="async">
-      <span class="logo-txt">
-        <b>Fami<i>Lab</i></b>
-        <span>Laboratorio de Análisis Clínicos</span>
-      </span>
+    <a href="{ini or '#inicio'}" class="logo" aria-label="Centro Médico San Blas y Laboratorio FamiLab — inicio">
+      {marca_dual(base)}
     </a>
     <nav class="nav" id="nav" aria-label="Navegación principal">
 {links}
     </nav>
     <div class="hdr-cta">
-      <a class="btn btn--wa" href="{cta}" target="_blank" rel="noopener">
-        <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Pedir presupuesto
+      <a class="btn btn--wa" href="{wa_sb('quiero agendar una consulta en el Centro Médico San Blas.')}" target="_blank" rel="noopener">
+        <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Agendar consulta
       </a>
       <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mnav">
         <svg class="ico" id="burger-i" aria-hidden="true"><use href="#i-menu"/></svg>
@@ -319,20 +428,81 @@ def header(base):
 
 <div class="mnav" id="mnav">
 {mlinks}
-  <a class="btn btn--wa btn--block" href="{cta}" target="_blank" rel="noopener">
-    <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Pedir presupuesto
+  <a class="btn btn--brand btn--block" href="{wa_sb('quiero agendar una consulta en el Centro Médico San Blas.')}" target="_blank" rel="noopener">
+    <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Agendar consulta
+  </a>
+  <a class="btn btn--wa btn--block" style="margin-top:10px" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener">
+    <svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg> Enviar pedido médico
   </a>
 </div>
 '''
 
-def presupuesto(base=''):
-    """Los tres pasos del camino principal: foto del pedido → presupuesto → venir."""
-    ini = base + 'index.html' if base else ''
+
+def seccion_rutas(base=''):
+    """Los dos recorridos. El documento lo marca como el punto fundamental."""
+    tarjetas = []
+    for i, r in enumerate(RUTAS):
+        pasos = '\n'.join(f'          <li><span>{n+1}</span> {e(p)}</li>' for n, p in enumerate(r['pasos']))
+        enlace = wa_sb(r['msg']) if r['sb'] else wa(r['msg'])
+        secundario = (f'<a class="ruta-alt" href="{base}#familab">Ver el laboratorio <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>'
+                      if r['sb'] else
+                      f'<a class="ruta-alt" href="{base}#servicios-lab">Ver análisis y servicios <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>')
+        tarjetas.append(f'''      <article class="ruta ruta--{r['clave']}" data-reveal style="--d:{i*110}ms">
+        <span class="ruta-marca"><svg class="ico" aria-hidden="true"><use href="#{r['icono']}"/></svg> {e(r['marca'])}</span>
+        <h3>{e(r['titulo'])}</h3>
+        <p>{e(r['desc'])}</p>
+        <ol class="ruta-pasos">
+{pasos}
+        </ol>
+        <a class="btn {'btn--brand' if r['sb'] else 'btn--wa'} btn--block" href="{enlace}" target="_blank" rel="noopener">
+          <svg class="ico" aria-hidden="true"><use href="#{r['icono_cta']}"/></svg> {e(r['cta'])}
+        </a>
+        {secundario}
+      </article>''')
     return f'''
-<section class="sec sec--alt" id="presupuesto">
+<section class="sec sec--alt" id="recorridos">
   <div class="wrap">
     <div class="sec-head center" data-reveal>
-      <span class="eyebrow">Presupuesto</span>
+      <span class="eyebrow">Por dónde empezar</span>
+      <h2>¿Qué necesitás hoy?</h2>
+      <p class="lead" style="margin-top:16px">Dos caminos distintos, según con qué llegues. No hace falta que recorras toda la página.</p>
+    </div>
+    <div class="rutas">
+{chr(10).join(tarjetas)}
+    </div>
+  </div>
+</section>
+'''
+
+
+def seccion_intenciones(base=''):
+    chips = '\n'.join(
+        f'''      <a class="motivo{' motivo--sb' if sb else ''}" data-reveal style="--d:{i*50}ms" href="{wa_sb(msg) if sb else wa(msg)}" target="_blank" rel="noopener"><span class="b"><svg class="ico" aria-hidden="true"><use href="#{ico}"/></svg></span> {e(t)} <svg class="arw" aria-hidden="true"><use href="#i-arrow"/></svg></a>'''
+        for i, (ico, t, msg, sb) in enumerate(INTENCIONES))
+    return f'''
+<section class="sec" id="contacto-intencion">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <span class="eyebrow">Escribinos</span>
+      <h2>Elegí para qué nos escribís</h2>
+      <p class="lead" style="margin-top:16px">Cada acceso abre WhatsApp con el mensaje ya armado, así te responde quien corresponde.</p>
+    </div>
+    <div class="motivos">
+{chips}
+    </div>
+  </div>
+</section>
+'''
+
+
+def presupuesto(base=''):
+    """Los tres pasos del camino del laboratorio."""
+    ini = base + 'index.html' if base else ''
+    return f'''
+<section class="sec sec--sky" id="presupuesto">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <span class="eyebrow">Presupuesto de laboratorio</span>
       <h2>Cómo saber cuánto te sale</h2>
       <p class="lead" style="margin-top:16px">No hace falta llamar ni venir hasta el laboratorio para preguntar el precio.</p>
     </div>
@@ -352,13 +522,12 @@ def presupuesto(base=''):
     </div>
     <div class="paso-nota" data-reveal>
       <svg aria-hidden="true"><use href="#i-info"/></svg>
-      <span>Los pedidos con muchas determinaciones o con letra difícil de leer los revisa un bioquímico antes de
-      responder: preferimos demorar unos minutos más y no pasarte un presupuesto equivocado.
+      <span>Si venís derivado del Centro Médico San Blas, avisanos al pedir el presupuesto: tenés descuentos especiales.
       <a href="{ini}#preguntas">Ver preguntas frecuentes</a></span>
     </div>
     <div class="center" style="margin-top:34px" data-reveal>
       <a class="btn btn--wa btn--lg" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener">
-        <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Mandar la foto del pedido médico
+        <svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg> Mandar la foto del pedido médico
       </a>
     </div>
   </div>
@@ -418,15 +587,44 @@ def tarjeta_sede(s, delay=0):
         </div>
       </article>'''
 
-def seccion_sedes():
+
+def seccion_ubicacion():
+    """Ubicación de los dos: el documento pide destacar que están a una cuadra."""
     tarjetas = '\n'.join(tarjeta_sede(s, i * 110) for i, s in enumerate(SEDES))
+    dir_sb = ('%s, %s' % (SAN_BLAS['dir'], SAN_BLAS['ciudad'])) if SAN_BLAS['dir'] else SAN_BLAS['ciudad']
     return f'''
-<section class="sec" id="sedes">
+<section class="sec" id="ubicacion">
   <div class="wrap">
     <div class="sec-head center" data-reveal>
       <span class="eyebrow">Dónde estamos</span>
-      <h2>Dos sedes en Itapúa</h2>
-      <p class="lead" style="margin-top:16px">Escribile directamente a la sede que te queda más cerca: cada una tiene su propio WhatsApp.</p>
+      <h2>La consulta y el laboratorio, a una cuadra</h2>
+      <p class="lead" style="margin-top:16px">Esa es la ventaja práctica del ecosistema: te atendés en San Blas y,
+      si te piden estudios, los hacés caminando.</p>
+    </div>
+
+    <div class="cuadra" data-reveal>
+      <div class="cuadra-punto cuadra-punto--sb">
+        <img src="fotos/san-blas-marca.png" alt="" width="400" height="400" decoding="async">
+        <div>
+          <b>{e(SAN_BLAS['nombre'])}</b>
+          <span>Consultas médicas · {e(dir_sb)}</span>
+        </div>
+      </div>
+      <div class="cuadra-linea" aria-hidden="true">
+        <span class="cuadra-dist">{e(SAN_BLAS['distancia'])}</span>
+      </div>
+      <div class="cuadra-punto cuadra-punto--fl">
+        <img src="fotos/logo-marca.png" alt="" width="400" height="400" decoding="async">
+        <div>
+          <b>Laboratorio FamiLab</b>
+          <span>Análisis clínicos · {e(SEDES[0]['dir'])}, {e(SEDES[0]['ciudad'])}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head center" data-reveal style="margin-top:clamp(48px,6vw,80px);margin-bottom:clamp(28px,3vw,40px)">
+      <h3 style="font-size:clamp(1.3rem,2.4vw,1.7rem)">Las dos sedes del laboratorio</h3>
+      <p class="lead" style="margin-top:12px">Escribile directamente a la que te queda más cerca: cada una tiene su propio WhatsApp.</p>
     </div>
     <div class="sedes">
 {tarjetas}
@@ -435,12 +633,18 @@ def seccion_sedes():
 </section>
 '''
 
+
 def cta_final(texto):
     nums = '\n'.join(
         f'''      <a class="cta-num" href="{wa(PRESUPUESTO, s['tel'])}" target="_blank" rel="noopener">
         <svg aria-hidden="true"><use href="#i-wa"/></svg>
-        <span>{e(s['tel_vis'])}<small>{e(s['nombre'])}</small></span>
+        <span>{e(s['tel_vis'])}<small>FamiLab {e(s['nombre'])}</small></span>
       </a>''' for s in SEDES)
+    if TEL_SB_VIS:
+        nums = f'''      <a class="cta-num" href="{wa_sb('quiero agendar una consulta médica.')}" target="_blank" rel="noopener">
+        <svg aria-hidden="true"><use href="#i-wa"/></svg>
+        <span>{e(TEL_SB_VIS)}<small>Centro Médico San Blas</small></span>
+      </a>\n''' + nums
     return f'''
 <section class="sec dark cta-final" id="contacto">
   <div class="cta-orbs" aria-hidden="true">
@@ -450,12 +654,15 @@ def cta_final(texto):
     <svg class="cta-cross" style="width:48px;bottom:14%;left:8%;animation-delay:1.4s" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cross"/></svg>
   </div>
   <div class="wrap">
-    <span class="eyebrow" data-reveal>Presupuestos</span>
-    <h2 data-reveal style="--d:70ms">¿Tenés el pedido médico a mano?</h2>
+    <span class="eyebrow" data-reveal>Escribinos</span>
+    <h2 data-reveal style="--d:70ms">¿Empezamos por la consulta o por los análisis?</h2>
     <p class="lead" data-reveal style="--d:140ms;color:rgba(232,247,253,.84);max-width:640px;margin-inline:auto">{e(texto)}</p>
     <div class="btn-row" data-reveal style="--d:210ms">
+      <a class="btn btn--light btn--lg" href="{wa_sb('quiero agendar una consulta en el Centro Médico San Blas.')}" target="_blank" rel="noopener">
+        <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Agendar una consulta
+      </a>
       <a class="btn btn--wa btn--lg" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener">
-        <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Mandar la foto por WhatsApp
+        <svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg> Enviar pedido médico
       </a>
     </div>
     <div class="cta-nums" data-reveal style="--d:280ms">
@@ -465,107 +672,145 @@ def cta_final(texto):
 </section>
 '''
 
+
 def footer(base):
     ini = base + 'index.html' if base else ''
     servicios = '\n'.join(
         f'          <li><a href="{base}servicios/{s["slug"]}/index.html">{e(s["nombre"])}</a></li>' for s in SERVICIOS)
     sedes = '\n'.join(
-        f'''          <div><svg aria-hidden="true"><use href="#i-pin"/></svg><span><b style="color:#fff">{e(s['nombre'])}</b><br>{e(s['dir'])}<br>
+        f'''          <div><svg aria-hidden="true"><use href="#i-pin"/></svg><span><b style="color:#fff">FamiLab {e(s['nombre'])}</b><br>{e(s['dir'])}<br>
             <a href="{wa(PRESUPUESTO, s['tel'])}" target="_blank" rel="noopener">{e(s['tel_vis'])}</a></span></div>''' for s in SEDES)
+    sb_tel = (f'''<br><a href="{wa_sb('quiero agendar una consulta médica.')}" target="_blank" rel="noopener">{e(TEL_SB_VIS)}</a>'''
+              if TEL_SB_VIS else '')
     return f'''
 <footer class="ftr">
   <div class="wrap">
     <div class="ftr-grid">
       <div>
-        <a href="{ini or '#inicio'}" class="logo-plate" aria-label="Laboratorio FamiLab — inicio">
-          <img src="{base}fotos/logo.png" alt="Laboratorio FamiLab" width="560" height="503" decoding="async">
+        <a href="{ini or '#inicio'}" class="logo-plate" aria-label="Centro Médico San Blas y Laboratorio FamiLab — inicio">
+          {marca_dual(base, 'marca-dual marca-dual--ftr')}
         </a>
-        <p class="ftr-claim">Laboratorio de análisis clínicos con 10 años de trayectoria en Coronel Bogado
-        y Carmen del Paraná. Urgencias, extracción a domicilio y convenios con seguros médicos.</p>
+        <p class="ftr-claim">Dos empresas del mismo propietario, a una cuadra una de la otra, en Coronel Bogado.
+        El Centro Médico San Blas atiende las consultas; FamiLab hace los análisis.</p>
       </div>
       <div>
-        <h4>Servicios</h4>
+        <h4>Laboratorio</h4>
         <ul>
 {servicios}
         </ul>
       </div>
       <div>
-        <h4>Sedes</h4>
+        <h4>Dónde estamos</h4>
         <div class="ftr-contact">
+          <div><svg aria-hidden="true"><use href="#i-stetho"/></svg><span><b style="color:#fff">{e(SAN_BLAS['nombre'])}</b><br>
+            Consultas médicas · {e(SAN_BLAS['ciudad'])}{sb_tel}</span></div>
 {sedes}
         </div>
         <a class="btn btn--wa" style="margin-top:22px" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener">
-          <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Pedir presupuesto
+          <svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg> Enviar pedido médico
         </a>
       </div>
     </div>
     <div class="ftr-bottom">
-      <span>© 2026 Laboratorio FamiLab. Todos los derechos reservados.</span>
+      <span>© 2026 Centro Médico San Blas · Laboratorio FamiLab. Todos los derechos reservados.</span>
       <span>Coronel Bogado y Carmen del Paraná — Itapúa, Paraguay</span>
     </div>
   </div>
 </footer>
 
-<a class="wa-float" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener" aria-label="Pedir presupuesto por WhatsApp">
+<a class="wa-float" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
   <svg aria-hidden="true"><use href="#i-wa"/></svg>
-  <span class="lbl">Pedí tu presupuesto</span>
+  <span class="lbl">Escribinos por WhatsApp</span>
 </a>
 
 <div class="wa-bar">
-  <a class="btn btn--wa btn--lg btn--block" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener">
-    <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Pedir presupuesto por WhatsApp
+  <a class="btn btn--brand btn--block" href="{wa_sb('quiero agendar una consulta en el Centro Médico San Blas.')}" target="_blank" rel="noopener">
+    <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Agendar consulta
+  </a>
+  <a class="btn btn--wa btn--block" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener">
+    <svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg> Enviar pedido
   </a>
 </div>
 '''
 
-def jsonld(extra=''):
-    servicios = ',\n      '.join('{"@type":"MedicalTest","name":"%s"}' % s['nombre'] for s in SERVICIOS)
+def _json(t):
+    import json
+    return json.dumps(t, ensure_ascii=False)
+
+
+def jsonld():
+    """Dos organizaciones distintas, relacionadas entre sí. Ninguna cuelga de la otra."""
+    servicios = ',\n        '.join('{"@type":"MedicalTest","name":%s}' % _json(s['nombre']) for s in SERVICIOS)
     sedes = []
     for s in SEDES:
         geo = ('"geo":{"@type":"GeoCoordinates","latitude":%s,"longitude":%s},' % (LAT1, LNG1)
                if s['slug'] == 'coronel-bogado' else '')
         horas = ('''[
-        {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"06:00","closes":"21:00"},
-        {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"06:00","closes":"18:00"},
-        {"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"07:00","closes":"12:00"}
-      ]''' if s['slug'] == 'coronel-bogado' else '''[
-        {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"06:30","closes":"11:00"},
-        {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"13:00","closes":"15:00"},
-        {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"06:00","closes":"12:00"}
-      ]''')
+          {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"06:00","closes":"21:00"},
+          {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"06:00","closes":"18:00"},
+          {"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"07:00","closes":"12:00"}
+        ]''' if s['slug'] == 'coronel-bogado' else '''[
+          {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"06:30","closes":"11:00"},
+          {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"13:00","closes":"15:00"},
+          {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"06:00","closes":"12:00"}
+        ]''')
         sedes.append('''{
-      "@type":"MedicalClinic",
-      "name":"Laboratorio FamiLab — %s",
-      "address":{"@type":"PostalAddress","streetAddress":"%s","addressLocality":"%s","addressRegion":"Itapúa","postalCode":"%s","addressCountry":"PY"},
-      %s"telephone":"+%s",
-      "openingHoursSpecification":%s
-    }''' % (s['nombre'], s['dir'], s['ciudad'].split(',')[0], s['cp'], geo, s['tel'], horas))
+        "@type":"MedicalClinic",
+        "name":%s,
+        "address":{"@type":"PostalAddress","streetAddress":%s,"addressLocality":%s,"addressRegion":"Itapúa","postalCode":"%s","addressCountry":"PY"},
+        %s"telephone":"+%s",
+        "openingHoursSpecification":%s
+      }''' % (_json('Laboratorio FamiLab — ' + s['nombre']), _json(s['dir']),
+              _json(s['ciudad'].split(',')[0]), s['cp'], geo, s['tel'], horas))
+
+    esp_sb = (',\n      "availableService":[%s]' %
+              ','.join('{"@type":"MedicalSpecialty","name":%s}' % _json(n)
+                       for _, n, _ in ESPECIALIDADES_SB)) if ESPECIALIDADES_SB else ''
+    tel_sb = ',\n      "telephone":"+%s"' % TEL_SB if TEL_SB else ''
+
     return '''
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
-  "@type":"MedicalBusiness",
-  "name":"Laboratorio FamiLab",
-  "description":"Laboratorio de análisis clínicos en Coronel Bogado y Carmen del Paraná, Itapúa. Análisis de rutina, hormonales, microbiológicos, urgencias y extracción de muestras a domicilio.",
-  "url":"%s/",
-  "logo":"%s/fotos/logo.png",
-  "foundingDate":"2016",
-  "areaServed":["Coronel Bogado","Carmen del Paraná","Itapúa, Paraguay"],
-  "telephone":"+%s",
-  "department":[
-    %s
-  ],
-  "availableService":[
-      %s
-  ]%s
+  "@graph":[
+    {
+      "@type":"MedicalClinic",
+      "@id":"%s/#san-blas",
+      "name":%s,
+      "description":"Centro médico en Coronel Bogado, Itapúa. Consultas médicas, especialidades y seguimiento, con laboratorio de análisis clínicos a una cuadra.",
+      "url":"%s/",
+      "logo":"%s/fotos/san-blas.png",
+      "address":{"@type":"PostalAddress","addressLocality":"Coronel Bogado","addressRegion":"Itapúa","addressCountry":"PY"},
+      "areaServed":["Coronel Bogado","Itapúa, Paraguay"]%s%s
+    },
+    {
+      "@type":"MedicalBusiness",
+      "@id":"%s/#familab",
+      "name":"Laboratorio FamiLab",
+      "description":"Laboratorio de análisis clínicos en Coronel Bogado y Carmen del Paraná, Itapúa. Análisis de rutina, hormonales, microbiológicos, urgencias y extracción de muestras a domicilio.",
+      "url":"%s/",
+      "logo":"%s/fotos/logo.png",
+      "foundingDate":"2016",
+      "areaServed":["Coronel Bogado","Carmen del Paraná","Itapúa, Paraguay"],
+      "telephone":"+%s",
+      "department":[
+        %s
+      ],
+      "availableService":[
+        %s
+      ]
+    }
+  ]
 }
 </script>
-''' % (DOMINIO, DOMINIO, TEL1, ',\n    '.join(sedes), servicios, extra)
+''' % (DOMINIO, _json(SAN_BLAS['nombre']), DOMINIO, DOMINIO, tel_sb, esp_sb,
+       DOMINIO, DOMINIO, DOMINIO, TEL1, ',\n      '.join(sedes), servicios)
 
-def faq_ld():
+
+def faq_ld(preguntas):
     entradas = ',\n    '.join(
         '{"@type":"Question","name":%s,"acceptedAnswer":{"@type":"Answer","text":%s}}'
-        % (_json(q), _json(' '.join(a))) for q, a in FAQ)
+        % (_json(q), _json(' '.join(a))) for q, a in preguntas)
     return '''
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
@@ -574,27 +819,69 @@ def faq_ld():
 </script>
 ''' % entradas
 
-def _json(t):
-    import json
-    return json.dumps(t, ensure_ascii=False)
 
-def cierre(base, extra_ld='', con_faq=False):
-    return footer(base) + jsonld(extra_ld) + (faq_ld() if con_faq else '') + f'''
+def cierre(base, preguntas=None):
+    return footer(base) + jsonld() + (faq_ld(preguntas) if preguntas else '') + f'''
 <script src="{base}assets/app.js" defer></script>
 </body>
 </html>
 '''
 
-# ================================================================= index ====
+
+# ============================================== escenas ilustradas ====
+def escena_consulta():
+    """Hero de San Blas: la consulta médica, con el laboratorio como satélite."""
+    return '''
+      <div class="scene-in">
+        <div class="glow"></div>
+        <div class="ring ring--c"></div>
+        <div class="ring ring--a"><i></i></div>
+        <div class="ring ring--b"><i></i></div>
+        <div class="pedestal"></div>
+        <div class="flask-wrap" style="width:46%">
+          <svg class="ill" viewBox="0 0 200 190">
+            <defs>
+              <linearGradient id="cor" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#3FC3F4"/><stop offset=".55" stop-color="#00AFF0"/><stop offset="1" stop-color="#0093C6"/>
+              </linearGradient>
+              <linearGradient id="fig" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#AEDC8E"/><stop offset="1" stop-color="#63A93D"/>
+              </linearGradient>
+              <linearGradient id="bri" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path fill="url(#cor)" d="M100 176C59 145 16 116 16 73 16 46 37 25 63 25c15 0 28 7 37 19 9-12 22-19 37-19 26 0 47 21 47 48 0 43-43 72-84 103Z"/>
+            <circle cx="76" cy="78" r="11" fill="url(#fig)"/>
+            <path fill="url(#fig)" d="M60 112c0-11 7-19 16-19s16 8 16 19z"/>
+            <circle cx="120" cy="86" r="9" fill="url(#fig)"/>
+            <path fill="url(#fig)" d="M107 114c0-9 6-16 13-16s13 7 13 16z"/>
+            <ellipse cx="68" cy="58" rx="24" ry="15" fill="url(#bri)" transform="rotate(-24 68 58)" opacity=".6"/>
+          </svg>
+        </div>
+        <div class="res-card">
+          <div class="lbl"><span>Consulta → análisis</span><em>a una cuadra</em></div>
+          <div class="res-rows"><i></i><i></i><i></i></div>
+        </div>
+        <div class="chip3d chip3d--1"><span class="b"><svg class="ico" aria-hidden="true"><use href="#i-stetho"/></svg></span><span>Consultas médicas<small>Centro Médico San Blas</small></span></div>
+        <div class="chip3d chip3d--2 chip3d--leaf"><span class="b"><svg class="ico" aria-hidden="true"><use href="#i-tube"/></svg></span><span>Laboratorio propio<small>FamiLab, a una cuadra</small></span></div>
+        <div class="chip3d chip3d--3"><span class="b"><svg class="ico" aria-hidden="true"><use href="#i-doc-check"/></svg></span><span>Resultados en el día<small>en la mayoría de los estudios</small></span></div>
+        <div class="chip3d chip3d--4 chip3d--leaf"><span class="b"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></span><span>Extracción a domicilio<small>casco urbano y compañías</small></span></div>
+        <div class="particles">
+          <i style="width:7px;height:7px;top:16%;left:22%"></i>
+          <i style="width:5px;height:5px;top:64%;left:14%;animation-delay:1.6s"></i>
+          <i style="width:8px;height:8px;top:78%;left:72%;animation-delay:3.1s"></i>
+          <i style="width:5px;height:5px;top:24%;left:82%;animation-delay:2.2s"></i>
+        </div>
+      </div>'''
+
+
 def escena_matraz(chips=True):
-    """Matraz de laboratorio en 3D, con los colores del logo."""
     extra = '''
         <div class="chip3d chip3d--1"><span class="b"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg></span><span>Resultados en el día<small>en la mayoría de los estudios</small></span></div>
-        <div class="chip3d chip3d--2 chip3d--leaf"><span class="b"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></span><span>Extracción a domicilio<small>casco urbano y compañías</small></span></div>
-        <div class="chip3d chip3d--3"><span class="b"><svg class="ico" aria-hidden="true"><use href="#i-building"/></svg></span><span>Dos sedes<small>Cnel. Bogado y Carmen del Paraná</small></span></div>
-        <div class="chip3d chip3d--4 chip3d--leaf"><span class="b"><svg class="ico" aria-hidden="true"><use href="#i-moon"/></svg></span><span>Urgencias al llamado<small>fuera del horario de atención</small></span></div>''' if chips else ''
+        <div class="chip3d chip3d--2 chip3d--leaf"><span class="b"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></span><span>Extracción a domicilio<small>casco urbano y compañías</small></span></div>''' if chips else ''
     return f'''
-      <div class="scene-in" id="sceneIn">
+      <div class="scene-in">
         <div class="glow"></div>
         <div class="ring ring--c"></div>
         <div class="ring ring--a"><i></i></div>
@@ -635,12 +922,105 @@ def escena_matraz(chips=True):
           <i style="width:7px;height:7px;top:16%;left:22%"></i>
           <i style="width:5px;height:5px;top:64%;left:14%;animation-delay:1.6s"></i>
           <i style="width:8px;height:8px;top:78%;left:72%;animation-delay:3.1s"></i>
-          <i style="width:5px;height:5px;top:24%;left:82%;animation-delay:2.2s"></i>
         </div>
       </div>'''
 
+# =================================================== secciones de San Blas ====
+def seccion_san_blas():
+    """Especialidades, profesionales y servicios del centro médico.
 
-def pagina_index():
+    Mientras no llegue la información de San Blas, la sección no inventa nada:
+    muestra la puerta de entrada real (consultar por WhatsApp qué especialidad
+    corresponde) y deja el bloque listo para cuando se carguen los datos.
+    """
+    pendiente = not (ESPECIALIDADES_SB or PROFESIONALES_SB or SERVICIOS_SB)
+
+    esp = ''
+    if ESPECIALIDADES_SB:
+        cards = '\n'.join(f'''      <article class="card" data-reveal style="--d:{i*70}ms">
+        <span class="itile{' itile--leaf' if i % 3 == 1 else ''}"><svg class="ico" aria-hidden="true"><use href="#{ico}"/></svg></span>
+        <h3>{e(n)}</h3>
+        <p>{e(d)}</p>
+        <a class="card-link" href="{wa_sb('quiero consultar por %s en el Centro Médico San Blas.' % n.lower())}" target="_blank" rel="noopener">Agendar consulta <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </article>''' for i, (ico, n, d) in enumerate(ESPECIALIDADES_SB))
+        esp = f'''
+    <div class="sec-head center" data-reveal style="margin-top:clamp(40px,5vw,64px)">
+      <h3 style="font-size:clamp(1.3rem,2.4vw,1.7rem)">Especialidades</h3>
+      <p class="lead" style="margin-top:12px">Buscá el problema más parecido al tuyo y pedí el turno.</p>
+    </div>
+    <div class="grid serv-grid">
+{cards}
+    </div>'''
+
+    pro = ''
+    if PROFESIONALES_SB:
+        cards = '\n'.join(f'''      <article class="team-card" data-reveal style="--d:{i*70}ms">
+        <span class="av"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg></span>
+        <div>
+          <h3>{e(p['nombre'])}</h3>
+          <span class="rol">{e(p['esp'])}</span>
+          <p class="reg">{e(p.get('reg', ''))}</p>
+          <a class="card-link" href="{wa_sb('quiero agendar una consulta con %s.' % p['nombre'])}" target="_blank" rel="noopener">Agendar consulta <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>''' for i, p in enumerate(PROFESIONALES_SB))
+        pro = f'''
+    <div class="sec-head center" data-reveal style="margin-top:clamp(40px,5vw,64px)">
+      <h3 style="font-size:clamp(1.3rem,2.4vw,1.7rem)">Quién te atiende</h3>
+    </div>
+    <div class="grid team-grid">
+{cards}
+    </div>'''
+
+    serv = ''
+    if SERVICIOS_SB:
+        filas = '\n'.join(f'''        <div class="proc"><span class="itile{' itile--soft' if i % 2 else ''}"><svg class="ico" aria-hidden="true"><use href="#{ico}"/></svg></span><div><b>{e(n)}</b><span>{e(d)}</span></div></div>'''
+                          for i, (ico, n, d) in enumerate(SERVICIOS_SB))
+        serv = f'''
+    <div class="sec-head center" data-reveal style="margin-top:clamp(40px,5vw,64px)">
+      <h3 style="font-size:clamp(1.3rem,2.4vw,1.7rem)">¿Qué resolvés acá?</h3>
+    </div>
+    <div class="proc-list" style="max-width:820px;margin-inline:auto">
+{filas}
+    </div>'''
+
+    if pendiente:
+        cuerpo = f'''
+    <div class="vacio" data-reveal>
+      <span class="itile itile--accent"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg></span>
+      <h3>Contanos qué te pasa y te decimos quién te puede atender</h3>
+      <p>Escribinos por WhatsApp con tu motivo de consulta. Te confirmamos qué profesional corresponde
+      a tu caso y qué horarios hay disponibles en el Centro Médico San Blas.</p>
+      <div class="btn-row" style="justify-content:center;margin-top:26px">
+        <a class="btn btn--brand btn--lg" href="{wa_sb('quiero agendar una consulta en el Centro Médico San Blas.')}" target="_blank" rel="noopener">
+          <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Agendar una consulta
+        </a>
+        <a class="btn btn--ghost btn--lg" href="{wa_sb('quiero consultar qué especialidades atienden en el Centro Médico San Blas.')}" target="_blank" rel="noopener">
+          <svg class="ico" aria-hidden="true"><use href="#i-stetho"/></svg> Consultar especialidades
+        </a>
+      </div>
+    </div>'''
+    else:
+        cuerpo = esp + pro + serv
+
+    return f'''
+<section class="sec sec--sb" id="san-blas">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <span class="marca-chip marca-chip--sb">
+        <img src="fotos/san-blas-marca.png" alt="" width="400" height="400" decoding="async"> Centro Médico San Blas
+      </span>
+      <h2>Atención médica en Coronel Bogado</h2>
+      <p class="lead" style="margin-top:16px">Consultas con especialistas, diagnóstico y seguimiento.
+      Si en la consulta te piden estudios, los hacés en FamiLab, a una cuadra.</p>
+    </div>
+{cuerpo}
+  </div>
+</section>
+'''
+
+
+def seccion_familab():
+    """El bloque propio de FamiLab: identidad, argumentos y sus tres CTA."""
     serv_cards = '\n'.join(f'''      <article class="card" data-reveal style="--d:{i*70}ms">
         <span class="itile{' itile--leaf' if i % 3 == 1 else ''}"><svg class="ico" aria-hidden="true"><use href="#{s['icono']}"/></svg></span>
         <h3>{e(s['nombre'])}</h3>
@@ -648,10 +1028,100 @@ def pagina_index():
         <a class="card-link" href="servicios/{s['slug']}/index.html">Ver el servicio <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </article>''' for i, s in enumerate(SERVICIOS))
 
-    motivos = '\n'.join(
-        f'''      <a class="motivo" data-reveal style="--d:{i*50}ms" href="{wa(msg)}" target="_blank" rel="noopener"><span class="b"><svg class="ico" aria-hidden="true"><use href="#{ico}"/></svg></span> {e(t)} <svg class="arw" aria-hidden="true"><use href="#i-arrow"/></svg></a>'''
-        for i, (ico, t, msg) in enumerate(MOTIVOS))
+    return f'''
+<section class="sec dark" id="familab">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <span class="marca-chip marca-chip--fl">
+        <img src="fotos/logo-marca.png" alt="" width="400" height="400" decoding="async"> Laboratorio FamiLab
+      </span>
+      <h2>¿Tu médico te pidió análisis?</h2>
+      <p class="lead" style="margin-top:16px;color:rgba(232,247,253,.84)">
+        FamiLab es el laboratorio del ecosistema, con marca y trayectoria propias: diez años haciendo
+        análisis clínicos en Itapúa, con dos sedes y servicio de urgencias.
+      </p>
+    </div>
 
+    <div class="nums nums--dark" data-reveal>
+      <div class="num-card"><b>10 años</b><span>de trayectoria en análisis clínicos</span></div>
+      <div class="num-card" style="--d:90ms"><b>+49.000</b><span>pacientes registrados en el sistema</span></div>
+      <div class="num-card" style="--d:180ms"><b>2 sedes</b><span>Coronel Bogado y Carmen del Paraná</span></div>
+    </div>
+
+    <div class="grid lab-grid" data-reveal style="--d:120ms;margin-top:clamp(20px,2.4vw,30px)">
+      <div class="glass"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-doc-check"/></svg></span><h3>Resultados en el día</h3><p>La mayoría de las determinaciones de rutina se entrega el mismo día.</p></div>
+      <div class="glass"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-micro"/></svg></span><h3>Lo que no se hace en el hospital</h3><p>Hormonales, microbiológicos y especializados, sin viajar a Encarnación.</p></div>
+      <div class="glass"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-moon"/></svg></span><h3>Urgencias al llamado</h3><p>Fuera del horario de atención respondemos por teléfono, en las dos sedes.</p></div>
+      <div class="glass"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></span><h3>Extracción a domicilio</h3><p>Casco urbano, compañías y zonas rurales, coordinando antes por WhatsApp.</p></div>
+    </div>
+
+    <div class="btn-row" data-reveal style="justify-content:center;margin-top:clamp(32px,4vw,46px)">
+      <a class="btn btn--wa btn--lg" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener">
+        <svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg> Enviar pedido médico
+      </a>
+      <a class="btn btn--light btn--lg" href="{wa('quiero un presupuesto de análisis de laboratorio.')}" target="_blank" rel="noopener">
+        <svg class="ico" aria-hidden="true"><use href="#i-money"/></svg> Solicitar presupuesto
+      </a>
+      <a class="btn btn--outline-light btn--lg" href="#servicios-lab">
+        <svg class="ico" aria-hidden="true"><use href="#i-tubes"/></svg> Ver servicios de laboratorio
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="servicios-lab">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <span class="eyebrow">Laboratorio</span>
+      <h2>Análisis y servicios de FamiLab</h2>
+      <p class="lead" style="margin-top:16px">Si tu pedido incluye algún estudio muy específico que no procesamos acá,
+      lo derivamos a un laboratorio de mayor complejidad y te avisamos antes.</p>
+    </div>
+    <div class="grid serv-grid">
+{serv_cards}
+      <article class="card serv-cta" data-reveal style="--d:{len(SERVICIOS)*70}ms;background:linear-gradient(160deg,var(--cy-600),var(--cy-950));border-color:transparent;color:#fff">
+        <span class="itile" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.2);color:#fff"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg></span>
+        <h3 style="color:#fff">¿No sabés qué estudio necesitás?</h3>
+        <p style="color:rgba(232,247,253,.84)">Mandanos la foto del pedido médico o contanos qué te indicó el doctor.
+        Un bioquímico lo revisa y te responde.</p>
+        <a class="btn btn--wa btn--block" style="margin-top:20px" href="{wa('no sé qué estudio necesito. ¿Me orientan?')}" target="_blank" rel="noopener">
+          <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Consultar por WhatsApp
+        </a>
+      </article>
+    </div>
+  </div>
+</section>
+'''
+
+
+def seccion_circuito():
+    pasos = '\n'.join(f'''      <li class="circ-paso{' circ-paso--sb' if sb else ' circ-paso--fl'}" data-reveal style="--d:{i*80}ms">
+        <span class="circ-ico"><svg class="ico" aria-hidden="true"><use href="#{ico}"/></svg></span>
+        <b>{e(t)}</b>
+        <span class="circ-d">{e(d)}</span>
+      </li>''' for i, (ico, t, d, sb) in enumerate(CIRCUITO))
+    return f'''
+<section class="sec sec--leaf" id="circuito">
+  <div class="wrap">
+    <div class="sec-head center" data-reveal>
+      <span class="eyebrow">Cómo funciona</span>
+      <h2>Un solo circuito de atención</h2>
+      <p class="lead" style="margin-top:16px">Dos empresas distintas, un mismo recorrido para el paciente.
+      Y funciona igual al revés: si empezás por los análisis y hace falta un médico, lo tenés a una cuadra.</p>
+    </div>
+    <ol class="circuito">
+{pasos}
+    </ol>
+    <div class="circ-leyenda" data-reveal>
+      <span><i class="pt pt--sb"></i> Centro Médico San Blas</span>
+      <span><i class="pt pt--fl"></i> Laboratorio FamiLab</span>
+    </div>
+  </div>
+</section>
+'''
+
+# ================================================================= index ====
+def pagina_index():
     prep = '\n'.join(f'''      <article class="prep" data-reveal style="--d:{i*70}ms">
         <span class="itile{' itile--soft' if i % 2 else ''}"><svg class="ico" aria-hidden="true"><use href="#{ico}"/></svg></span>
         <div><h3>{e(t)}</h3><p>{e(d)}</p></div>
@@ -671,121 +1141,57 @@ def pagina_index():
     pagos = '\n'.join(
         f'        <span class="pill"><svg aria-hidden="true"><use href="#i-check"/></svg> {e(x)}</span>' for x in PAGOS)
 
+    preguntas = FAQ_ECO + FAQ
     faq = '\n'.join(f'''      <details data-reveal style="--d:{min(i,6)*50}ms"{' open' if i == 0 else ''}>
         <summary>{e(q)} <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
         <div class="ans">{''.join('<p>%s</p>' % e(x) for x in a)}</div>
-      </details>''' for i, (q, a) in enumerate(FAQ))
+      </details>''' for i, (q, a) in enumerate(preguntas))
 
     dom = SERV_POR_SLUG['extraccion-a-domicilio']
 
     return head(
-        'Laboratorio FamiLab | Análisis clínicos en Coronel Bogado y Carmen del Paraná',
-        'Laboratorio de análisis clínicos con 10 años en Itapúa. Mandá la foto de tu pedido médico por '
-        'WhatsApp y te pasamos el presupuesto. Análisis de rutina, hormonales y microbiológicos, urgencias '
-        'al llamado y extracción de muestras a domicilio.',
+        'Centro Médico San Blas + FamiLab | Consultas y análisis en Coronel Bogado',
+        'Consultas médicas en el Centro Médico San Blas y análisis clínicos en el Laboratorio FamiLab, '
+        'a una cuadra en Coronel Bogado. Agendá tu consulta o mandá la foto de tu pedido médico por WhatsApp.',
         '', '') + header('') + f'''
 <main id="inicio">
 
 <section class="hero">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <span class="badge" data-reveal><i class="dot"></i> FamiLab · 10 años en Itapúa</span>
-      <h1 data-reveal style="--d:80ms">¿Tenés un <span class="u">pedido médico?</span></h1>
+      <span class="badge" data-reveal><i class="dot"></i> San Blas + FamiLab · Coronel Bogado</span>
+      <h1 data-reveal style="--d:80ms">Tu salud, atendida <span class="u">en un mismo lugar</span></h1>
       <p class="hero-sub" data-reveal style="--d:160ms">
-        Mandanos la foto por WhatsApp y te pasamos el presupuesto: qué muestras vamos a tomar,
-        si necesitás ayuno y cuándo estarían los resultados.
+        Consultás con un médico en el Centro Médico San Blas y, si te pide estudios, los hacés
+        en el Laboratorio FamiLab, a una cuadra. La consulta y los análisis, sin vueltas.
       </p>
       <p class="hero-note" data-reveal style="--d:220ms">
-        Coronel Bogado, de 06:00 a 21:00 hs, también sábados y domingos.
-        Carmen del Paraná, de lunes a sábado.
+        Dos empresas del mismo propietario que trabajan juntas: San Blas atiende, FamiLab analiza.
       </p>
       <div class="btn-row" data-reveal style="--d:280ms">
-        <a class="btn btn--wa btn--lg" href="{wa(PRESUPUESTO)}" target="_blank" rel="noopener">
-          <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Mandar la foto del pedido
+        <a class="btn btn--brand btn--lg" href="{wa_sb('quiero agendar una consulta en el Centro Médico San Blas.')}" target="_blank" rel="noopener">
+          <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Agendar una consulta
         </a>
-        <a class="btn btn--ghost btn--lg" href="#servicios">
-          <svg class="ico" aria-hidden="true"><use href="#i-tubes"/></svg> Ver análisis y servicios
+        <a class="btn btn--ghost btn--lg" href="#san-blas">
+          <svg class="ico" aria-hidden="true"><use href="#i-stetho"/></svg> Ver especialidades
         </a>
       </div>
       <div class="hero-mini" data-reveal style="--d:340ms">
-        <span><svg aria-hidden="true"><use href="#i-check-c"/></svg> Más de 49.000 pacientes atendidos</span>
-        <span><svg aria-hidden="true"><use href="#i-check-c"/></svg> La mayoría de los resultados, en el día</span>
-        <span><svg aria-hidden="true"><use href="#i-check-c"/></svg> Extracción a domicilio</span>
+        <span><svg aria-hidden="true"><use href="#i-check-c"/></svg> Consultas médicas y laboratorio a una cuadra</span>
+        <span><svg aria-hidden="true"><use href="#i-check-c"/></svg> Más de 49.000 pacientes en el laboratorio</span>
+        <span><svg aria-hidden="true"><use href="#i-check-c"/></svg> Urgencias y atención a domicilio</span>
       </div>
     </div>
 
-    <div class="scene" id="scene" aria-hidden="true">{escena_matraz()}
+    <div class="scene" aria-hidden="true">{escena_consulta()}
     </div>
   </div>
 </section>
-
-<section class="sec datos" style="padding-top:clamp(10px,2vw,26px)">
-  <div class="wrap">
-    <div class="grid datos-grid">
-      <article class="card" data-reveal>
-        <span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg></span>
-        <h3>Abrimos a las 06:00</h3>
-        <p>En Coronel Bogado atendemos hasta las 21:00 hs, y también sábados y domingos.</p>
-      </article>
-      <article class="card" data-reveal style="--d:90ms">
-        <span class="itile itile--soft"><svg class="ico" aria-hidden="true"><use href="#i-doc-check"/></svg></span>
-        <h3>Resultados en el día</h3>
-        <p>La mayoría de las determinaciones de rutina se entrega el mismo día. Te los mandamos por WhatsApp si querés.</p>
-      </article>
-      <article class="card" data-reveal style="--d:180ms">
-        <span class="itile itile--accent"><svg class="ico" aria-hidden="true"><use href="#i-micro"/></svg></span>
-        <h3>Los estudios que no se hacen en el hospital</h3>
-        <p>Hormonales, microbiológicos y especializados, sin tener que viajar a Encarnación.</p>
-      </article>
-      <article class="card" data-reveal style="--d:270ms">
-        <span class="itile itile--warn"><svg class="ico" aria-hidden="true"><use href="#i-moon"/></svg></span>
-        <h3>Urgencias al llamado</h3>
-        <p>Fuera del horario de atención respondemos por teléfono, en las dos sedes.</p>
-      </article>
-    </div>
-  </div>
-</section>
-''' + presupuesto() + f'''
-<section class="sec sec--sky" id="servicios">
+''' + seccion_rutas() + seccion_san_blas() + seccion_circuito() + seccion_familab() + presupuesto() + f'''
+<section class="sec sec--alt" id="preparacion">
   <div class="wrap">
     <div class="sec-head center" data-reveal>
-      <span class="eyebrow">Qué hacemos</span>
-      <h2>Análisis y servicios</h2>
-      <p class="lead" style="margin-top:16px">Si tu pedido incluye algún estudio muy específico que no procesamos acá,
-      lo derivamos a un laboratorio de mayor complejidad y te avisamos antes.</p>
-    </div>
-    <div class="grid serv-grid">
-{serv_cards}
-      <article class="card serv-cta" data-reveal style="--d:{len(SERVICIOS)*70}ms;background:linear-gradient(160deg,var(--cy-600),var(--cy-950));border-color:transparent;color:#fff">
-        <span class="itile" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.2);color:#fff"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg></span>
-        <h3 style="color:#fff">¿No sabés qué estudio necesitás?</h3>
-        <p style="color:rgba(232,247,253,.84)">Mandanos la foto del pedido médico o contanos qué te indicó el doctor.
-        Un bioquímico lo revisa y te responde.</p>
-        <a class="btn btn--wa btn--block" style="margin-top:20px" href="{wa('no sé qué estudio necesito. ¿Me orientan?')}" target="_blank" rel="noopener">
-          <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Consultar por WhatsApp
-        </a>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="sec">
-  <div class="wrap">
-    <div class="sec-head center" data-reveal>
-      <span class="eyebrow">Accesos rápidos</span>
-      <h2>¿Qué necesitás consultar?</h2>
-      <p class="lead" style="margin-top:16px">Tocá lo más parecido a tu caso y te respondemos por WhatsApp.</p>
-    </div>
-    <div class="motivos">
-{motivos}
-    </div>
-  </div>
-</section>
-
-<section class="sec sec--leaf" id="preparacion">
-  <div class="wrap">
-    <div class="sec-head center" data-reveal>
-      <span class="eyebrow">Antes de venir</span>
+      <span class="eyebrow">Antes de venir al laboratorio</span>
       <h2>Cómo prepararte</h2>
       <p class="lead" style="margin-top:16px">Venir bien preparado evita tener que repetir la extracción otro día.</p>
     </div>
@@ -800,14 +1206,12 @@ def pagina_index():
   </div>
 </section>
 
-<section class="sec dark" id="domicilio">
+<section class="sec sec--sky" id="domicilio">
   <div class="wrap split">
     <div data-reveal>
       <span class="eyebrow">A domicilio</span>
       <h2>Si no podés venir, vamos nosotros</h2>
-      <p class="lead" style="margin-top:20px;color:rgba(232,247,253,.84)">
-        {e(dom['intro'])}
-      </p>
+      <p class="lead" style="margin-top:20px">{e(dom['intro'])}</p>
       <ul class="checklist">
         <li><svg aria-hidden="true"><use href="#i-check-c"/></svg> Salimos a partir de las 07:00 hs, coordinando antes por WhatsApp</li>
         <li><svg aria-hidden="true"><use href="#i-check-c"/></svg> 15.000 Gs de traslado dentro del casco urbano</li>
@@ -816,43 +1220,29 @@ def pagina_index():
       </ul>
       <div class="btn-row" style="margin-top:32px">
         <a class="btn btn--wa btn--lg" href="{wa('quiero una extracción a domicilio. Mi ubicación es:')}" target="_blank" rel="noopener">
-          <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Coordinar una extracción
+          <svg class="ico" aria-hidden="true"><use href="#i-home"/></svg> Solicitar coleta a domicilio
         </a>
-        <a class="btn btn--outline-light btn--lg" href="servicios/extraccion-a-domicilio/index.html">
+        <a class="btn btn--ghost btn--lg" href="servicios/extraccion-a-domicilio/index.html">
           Ver cómo funciona <svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg>
         </a>
       </div>
     </div>
-    <div class="grid lab-grid" data-reveal style="--d:120ms">
-      <div class="glass"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg></span><h3>Mandás tu ubicación</h3><p>Por WhatsApp, junto con la foto del pedido médico.</p></div>
-      <div class="glass"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span><h3>Coordinamos el horario</h3><p>Te confirmamos si llegamos a tu zona y a qué hora.</p></div>
-      <div class="glass"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-syringe"/></svg></span><h3>Tomamos la muestra en tu casa</h3><p>Con las mismas condiciones que en el laboratorio.</p></div>
-      <div class="glass"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-doc-check"/></svg></span><h3>Te avisamos los resultados</h3><p>Los retirás en la sede o te los enviamos por WhatsApp.</p></div>
+    <div class="media" data-reveal style="--d:120ms">
+      <div class="grid lab-grid">
+        <div class="card"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg></span><h3>Mandás tu ubicación</h3><p>Por WhatsApp, junto con la foto del pedido médico.</p></div>
+        <div class="card"><span class="itile itile--soft"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span><h3>Coordinamos el horario</h3><p>Te confirmamos si llegamos a tu zona y a qué hora.</p></div>
+        <div class="card"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-syringe"/></svg></span><h3>Tomamos la muestra en tu casa</h3><p>Con las mismas condiciones que en el laboratorio.</p></div>
+        <div class="card"><span class="itile itile--soft"><svg class="ico" aria-hidden="true"><use href="#i-doc-check"/></svg></span><h3>Te avisamos los resultados</h3><p>Los retirás en la sede o te los enviamos por WhatsApp.</p></div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="sec">
-  <div class="wrap">
-    <div class="sec-head center" data-reveal>
-      <span class="eyebrow">Trayectoria</span>
-      <h2>Diez años acompañando a la región</h2>
-      <p class="lead" style="margin-top:16px">FamiLab nació junto a la zona hospitalaria de Coronel Bogado, para que la gente
-      tuviera respuestas rápidas sin tener que viajar. En 2020 abrimos la sucursal de Carmen del Paraná.</p>
-    </div>
-    <div class="nums">
-      <div class="num-card" data-reveal><b>10 años</b><span>de trayectoria en análisis clínicos</span></div>
-      <div class="num-card" data-reveal style="--d:90ms"><b>+49.000</b><span>pacientes registrados en nuestro sistema</span></div>
-      <div class="num-card" data-reveal style="--d:180ms"><b>2 sedes</b><span>Coronel Bogado y Carmen del Paraná</span></div>
-    </div>
-  </div>
-</section>
-
-<section class="sec sec--alt" id="equipo">
+<section class="sec" id="equipo">
   <div class="wrap">
     <div class="sec-head center" data-reveal>
       <span class="eyebrow">Quién procesa tus muestras</span>
-      <h2>Equipo profesional</h2>
+      <h2>Equipo profesional de FamiLab</h2>
       <p class="lead" style="margin-top:16px">Bioquímicos matriculados, con registro profesional y responsables técnicos en cada sede.</p>
     </div>
     <div class="grid team-grid">
@@ -861,14 +1251,14 @@ def pagina_index():
   </div>
 </section>
 
-<section class="sec sec--sky" id="convenios">
+<section class="sec sec--alt" id="convenios">
   <div class="wrap split">
     <div data-reveal>
       <span class="eyebrow">Convenios</span>
       <h2>Seguros médicos, empresas y derivaciones</h2>
       <p class="lead" style="margin-top:18px">
-        Trabajamos con seguros médicos y con empresas de la zona. Los pacientes derivados del Centro Médico
-        San Blas tienen descuentos especiales.
+        El laboratorio trabaja con seguros médicos y con empresas de la zona. Los pacientes derivados del
+        Centro Médico San Blas tienen descuentos especiales.
       </p>
       <div class="pills">
 {seguros}
@@ -894,14 +1284,14 @@ def pagina_index():
       <article class="card">
         <span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-stetho"/></svg></span>
         <h3>Médicos y clínicas que derivan</h3>
-        <p>Recibimos derivaciones del Centro Médico San Blas y de profesionales de la zona. Si sos médico y
-        querés derivar pacientes, escribinos y coordinamos.</p>
+        <p>Además del Centro Médico San Blas, recibimos derivaciones de profesionales de la zona.
+        Si sos médico y querés derivar pacientes, escribinos y coordinamos.</p>
         <a class="card-link" href="{wa('soy médico y quiero coordinar derivaciones al laboratorio.')}" target="_blank" rel="noopener">Coordinar derivaciones <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </article>
     </div>
   </div>
 </section>
-''' + seccion_sedes() + f'''
+''' + seccion_ubicacion() + seccion_intenciones() + f'''
 <section class="sec sec--alt" id="preguntas">
   <div class="wrap">
     <div class="sec-head center" data-reveal>
@@ -915,9 +1305,10 @@ def pagina_index():
   </div>
 </section>
 ''' + cta_final(
-    'Mandala por WhatsApp al número de la sede que te queda más cerca y te pasamos el presupuesto con '
-    'los plazos de entrega y la preparación que necesitás.'
-) + '\n</main>\n' + cierre('', con_faq=True)
+    'Si necesitás que te vea un médico, agendás la consulta en San Blas. Si ya tenés el pedido, '
+    'mandás la foto y FamiLab te pasa el presupuesto.'
+) + '\n</main>\n' + cierre('', preguntas=preguntas)
+
 
 # ================================================= páginas por servicio ====
 def pagina_servicio(s):
@@ -951,13 +1342,16 @@ def pagina_servicio(s):
 <section class="hero">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <a class="volver" href="{base}index.html"><svg aria-hidden="true"><use href="#i-arrow"/></svg> Todos los servicios</a>
+      <a class="volver" href="{base}index.html#familab"><svg aria-hidden="true"><use href="#i-arrow"/></svg> Todos los servicios del laboratorio</a>
+      <span class="marca-chip marca-chip--fl" data-reveal style="margin-bottom:18px">
+        <img src="{base}fotos/logo-marca.png" alt="" width="400" height="400" decoding="async"> Laboratorio FamiLab
+      </span>
       <h1 data-reveal>{e(s['titulo'])}</h1>
       <p class="hero-sub" data-reveal style="--d:120ms">{e(s['intro'])}</p>
       <p class="hero-note" data-reveal style="--d:180ms">{e(s['tiempo'])}</p>
       <div class="btn-row" data-reveal style="--d:240ms">
         <a class="btn btn--wa btn--lg" href="{enlace}" target="_blank" rel="noopener">
-          <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> Pedir presupuesto
+          <svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg> Enviar pedido médico
         </a>
         <a class="btn btn--ghost btn--lg" href="#incluye">Ver qué incluye <svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
@@ -998,12 +1392,44 @@ def pagina_servicio(s):
     </div>
   </div>
 </section>
-''' + presupuesto(base) + seccion_sedes() + f'''
+
+<section class="sec sec--sb">
+  <div class="wrap split">
+    <div data-reveal>
+      <span class="marca-chip marca-chip--sb" style="margin-bottom:18px">
+        <img src="{base}fotos/san-blas-marca.png" alt="" width="400" height="400" decoding="async"> Centro Médico San Blas
+      </span>
+      <h2>¿Todavía no tenés el pedido médico?</h2>
+      <p class="lead" style="margin-top:18px">
+        A una cuadra del laboratorio está el Centro Médico San Blas. Si necesitás que un médico te evalúe
+        antes de hacerte los estudios, agendás la consulta ahí y después volvés con el pedido.
+      </p>
+      <ul class="checklist">
+        <li><svg aria-hidden="true"><use href="#i-check-c"/></svg> Consulta médica y análisis a una cuadra</li>
+        <li><svg aria-hidden="true"><use href="#i-check-c"/></svg> Los pacientes derivados de San Blas tienen descuentos en el laboratorio</li>
+      </ul>
+      <div class="btn-row" style="margin-top:30px">
+        <a class="btn btn--brand btn--lg" href="{wa_sb('quiero agendar una consulta en el Centro Médico San Blas.')}" target="_blank" rel="noopener">
+          <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Agendar una consulta
+        </a>
+      </div>
+    </div>
+    <div data-reveal style="--d:120ms">
+      <div class="grid lab-grid">
+        <div class="card"><span class="itile itile--accent"><svg class="ico" aria-hidden="true"><use href="#i-stetho"/></svg></span><h3>Consulta</h3><p>Te atiende un médico en San Blas.</p></div>
+        <div class="card"><span class="itile"><svg class="ico" aria-hidden="true"><use href="#i-doc"/></svg></span><h3>Pedido médico</h3><p>Salís con los estudios indicados.</p></div>
+        <div class="card"><span class="itile itile--leaf"><svg class="ico" aria-hidden="true"><use href="#i-tube"/></svg></span><h3>Análisis</h3><p>Los hacés en FamiLab, a una cuadra.</p></div>
+        <div class="card"><span class="itile itile--soft"><svg class="ico" aria-hidden="true"><use href="#i-doc-check"/></svg></span><h3>Seguimiento</h3><p>Volvés a tu médico con los resultados.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+''' + presupuesto(base) + seccion_ubicacion() + f'''
 <section class="sec sec--sky">
   <div class="wrap">
     <div class="sec-head center" data-reveal>
       <span class="eyebrow">También hacemos</span>
-      <h2>Otros servicios</h2>
+      <h2>Otros servicios del laboratorio</h2>
     </div>
     <div class="grid serv-grid">
 {relacionados}
@@ -1037,4 +1463,10 @@ if __name__ == '__main__':
         escribir('servicios/%s/index.html' % s['slug'], pagina_servicio(s))
     escribir('sitemap.xml', sitemap())
     escribir('robots.txt', 'User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n' % DOMINIO)
+    if not (ESPECIALIDADES_SB or PROFESIONALES_SB or SERVICIOS_SB):
+        print('\n  AVISO: falta cargar especialidades, profesionales y servicios del')
+        print('         Centro Médico San Blas (ver el README).')
+    if not TEL_SB:
+        print('  AVISO: falta el WhatsApp propio de San Blas; las consultas médicas')
+        print('         entran por el número de FamiLab Coronel Bogado.')
     print('Listo.')
